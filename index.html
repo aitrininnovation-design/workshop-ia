@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>IA &amp; Lavoro · Calatino</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Ctext y=%22.9em%22 font-size=%2290%22%3E🏺%3C/text%3E%3C/svg%3E">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blu:#1F4E8C; --blu2:#2E6FC0; --terra:#C8553D; --giallo:#F2B134; --verde:#2A9D6F; --rosso:#C0392B;
+    --crema:#FBF6EE; --ink:#1D2433; --muted:#6B7280; --card:#FFFFFF; --line:#E8E1D5; --soft:#F3ECE0;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{font-family:Inter,system-ui,-apple-system,sans-serif;background:var(--crema);color:var(--ink);
+       -webkit-tap-highlight-color:transparent;min-height:100vh}
+  h1,h2,h3{font-family:'Bricolage Grotesque',Inter,sans-serif;margin:0}
+  header{position:sticky;top:0;z-index:5;color:#fff;padding:12px 16px 10px;
+    background:radial-gradient(circle at 10px 10px,rgba(242,177,52,.55) 3px,transparent 4px) 0 0/20px 20px,
+               linear-gradient(135deg,var(--blu),var(--blu2));
+    box-shadow:0 2px 12px rgba(31,78,140,.25)}
+  .top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .brand{font-family:'Bricolage Grotesque';font-weight:800;font-size:18px}
+  .brand small{display:block;font-family:Inter;font-weight:500;font-size:12px;opacity:.85}
+  .chip{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);border-radius:999px;
+        padding:6px 12px;font-size:13px;font-weight:600;white-space:nowrap}
+  .chip b{color:var(--giallo)}
+  .sub{display:flex;justify-content:space-between;align-items:center;margin-top:8px;font-size:12px;font-weight:600;
+       letter-spacing:.05em;text-transform:uppercase;opacity:.95}
+  .timer{font-family:'Bricolage Grotesque';font-size:16px;letter-spacing:0;background:var(--giallo);color:var(--ink);
+         border-radius:8px;padding:2px 8px;display:none}
+  .timer.urg{background:#fff;color:var(--rosso)}
+  main{max-width:560px;margin:0 auto;padding:16px 16px 110px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .lead{font-size:15px;line-height:1.5;color:var(--muted);margin:6px 0 0}
+  label{display:block;font-weight:600;font-size:14px;margin:16px 0 6px}
+  .hint{font-weight:400;color:var(--muted);font-size:12.5px}
+  input[type=text],input[type=number],textarea,select{width:100%;font:inherit;font-size:16px;padding:12px 14px;
+        border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink);outline:none}
+  input:focus,textarea:focus,select:focus{border-color:var(--blu2)}
+  textarea{min-height:76px;resize:vertical}
+  .chips{display:flex;flex-wrap:wrap;gap:8px}
+  .opt{border:1.5px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font:inherit;font-size:14px;font-weight:600;color:var(--ink);cursor:pointer}
+  .opt.on{background:var(--blu);border-color:var(--blu);color:#fff}
+  .btn{display:block;width:100%;border:0;border-radius:14px;padding:16px;font:inherit;font-size:17px;font-weight:700;
+       background:var(--terra);color:#fff;cursor:pointer;margin-top:18px;box-shadow:0 4px 0 #9E3F2B}
+  .btn:active{transform:translateY(2px);box-shadow:0 2px 0 #9E3F2B}
+  .btn:disabled{opacity:.6}
+  .btn.sec{background:#fff;color:var(--blu);border:1.5px solid var(--line);box-shadow:none;font-size:15px;padding:12px}
+  .sticky{position:fixed;left:0;right:0;bottom:0;padding:12px 16px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(transparent,var(--crema) 30%)}
+  .sticky .btn{max-width:528px;margin:0 auto}
+  .domanda{font-family:'Bricolage Grotesque';font-size:25px;line-height:1.25;min-height:110px}
+  .vf{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:18px}
+  .vf button{border:0;border-radius:18px;padding:30px 10px;font:inherit;font-size:22px;font-weight:800;color:#fff;cursor:pointer}
+  .vf .v{background:var(--verde);box-shadow:0 5px 0 #1E7553}
+  .vf .f{background:var(--rosso);box-shadow:0 5px 0 #8E2A20}
+  .barra{height:10px;background:var(--soft);border-radius:99px;overflow:hidden;margin-top:14px}
+  .barra i{display:block;height:100%;background:var(--giallo);transition:width .25s linear}
+  .testo h3{font-size:17px;margin-bottom:4px}
+  .frase{display:block;width:100%;text-align:left;border:1.5px dashed transparent;background:transparent;border-radius:10px;
+         padding:8px 10px;margin:4px 0;font:inherit;font-size:15.5px;line-height:1.45;color:var(--ink);cursor:pointer}
+  .frase.on{background:#FFF1D6;border-color:var(--giallo)}
+  .tipi{display:flex;flex-wrap:wrap;gap:6px;margin:2px 0 10px 10px}
+  .tipi .opt{padding:7px 10px;font-size:12.5px}
+  .esito{border-radius:10px;padding:10px 12px;margin:6px 0;font-size:14.5px;line-height:1.4}
+  .esito small{display:block;margin-top:4px;opacity:.85}
+  .ok{background:#E3F4EC;border-left:4px solid var(--verde)}
+  .ko{background:#FDE7E3;border-left:4px solid var(--rosso)}
+  .mm{background:#FFF1D6;border-left:4px solid var(--giallo)}
+  .big{font-family:'Bricolage Grotesque';font-weight:800;font-size:56px;color:var(--terra);line-height:1}
+  .center{text-align:center}
+  .pulse{width:14px;height:14px;border-radius:50%;background:var(--verde);display:inline-block;margin-right:8px;vertical-align:-2px;animation:pulse 1.4s infinite}
+  @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(42,157,111,.6)}100%{box-shadow:0 0 0 16px rgba(42,157,111,0)}}
+  .prompt{white-space:pre-wrap;background:var(--soft);border-radius:12px;padding:12px;font-size:13.5px;line-height:1.45}
+  .scheda dt{font-weight:700;margin-top:10px;font-size:13px;color:var(--blu)}
+  .scheda dd{margin:2px 0 0;font-size:15px}
+  .progetto{border:1.5px solid var(--line);border-radius:14px;padding:14px;margin-bottom:10px;cursor:pointer;background:#fff}
+  .progetto.on{border-color:var(--terra);background:#FCEEEA}
+  .progetto b{font-family:'Bricolage Grotesque';font-size:18px}
+  .tag{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:var(--soft);color:var(--blu);padding:4px 8px;border-radius:6px;margin-bottom:6px}
+  .banner{background:#FFF1D6;border:1.5px solid var(--giallo);border-radius:12px;padding:10px 12px;font-size:14px;margin-bottom:12px;display:none}
+  .toast{position:fixed;left:16px;right:16px;top:96px;z-index:20;background:var(--ink);color:#fff;padding:14px;border-radius:12px;
+         font-size:14px;text-align:center;opacity:0;transform:translateY(-10px);transition:.25s;pointer-events:none}
+  .toast.on{opacity:1;transform:none}
+  .confetto{position:fixed;top:-30px;font-size:26px;z-index:30;pointer-events:none;animation:cade 1.6s ease-in forwards}
+  @keyframes cade{to{transform:translateY(110vh) rotate(540deg);opacity:.7}}
+  .loader{text-align:center;padding:60px 0;color:var(--muted)}
+  .grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+<header>
+  <div class="top">
+    <div class="brand">IA &amp; Lavoro<small>Workshop · Calatino</small></div>
+    <div class="chip" id="chip">Benvenuto</div>
+  </div>
+  <div class="sub"><span id="faseTag">Connessione…</span><span class="timer" id="timer"></span></div>
+</header>
+<main id="app"><div class="loader">Caricamento…</div></main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===================== CONTENUTI ===================== */
+const GRUPPI = ['Scala', 'Ceramica', 'Luminaria', 'Terracotta', 'Zagara'];
+const FILIERE = ['Agricoltura e agroalimentare', 'Ceramica e artigianato', 'Turismo culturale', 'Servizi alla persona', 'Piccola impresa commerciale'];
+const TITOLI = {
+  lobby: 'Si comincia', quiz: 'Sfida lampo', caccia: 'Lab 1 · Caccia all\'errore', progetto: 'Lab 2 · Assistente IA',
+  voto: 'Lab 2 · Voto', futuro: 'Lab 3 · Il mio futuro lavoro', chiusura: 'Il muro finale', podio: 'Podio'
+};
+const QUIZ = [
+  { t: 'L\'IA capisce il significato delle parole che usa.', sp: 'Calcola la probabilità delle associazioni tra parole: è un «pappagallo stocastico», non possiede il significato.' },
+  { t: 'L\'IA è lo specchio di ciò che è stato messo in rete, fake news comprese.', sp: 'Impara dai dati che riceve: se i dati sono sbagliati o parziali, lo sarà anche lei.' },
+  { t: 'La foto del Papa con il piumino bianco che girò sui social nel 2023 era vera.', sp: 'Era un\'immagine generata con l\'IA: la realtà oggi si può manipolare in pochi secondi.' },
+  { t: 'L\'IA sa spiegare anche eventi che non si sono mai visti nei dati.', sp: 'Lavora sulle frequenze che trova: davanti all\'imprevedibile serve l\'intelligenza umana.' },
+  { t: 'Saper fare buone domande a un chatbot conta più della tecnica informatica.', sp: 'È l\'arte di dialogare: chiedere approfondimenti, esempi e correlazioni.' },
+  { t: 'Se prendo una decisione con l\'aiuto dell\'IA, la responsabilità resta mia.', sp: 'Giudizio e responsabilità restano propri dell\'essere umano.' },
+  { t: 'Con l\'IA spariscono interi mestieri, non singole mansioni.', sp: 'Sono le mansioni a spostarsi: chi le conosce governa il cambiamento invece di subirlo.' },
+  { t: 'Nel microcredito la parte più importante è il denaro prestato.', sp: 'Il denaro è la parte più piccola: contano accompagnamento, relazione e fiducia in sé.' }
+];
+const TESTI = [
+  { titolo: 'Scheda turistica su Caltagirone', frasi: [
+    { id: 's1', t: 'Caltagirone è conosciuta nel mondo per la ceramica, lavorata qui da secoli.' },
+    { id: 's2', t: 'La Scala di Santa Maria del Monte conta 1.420 gradini decorati in maiolica.' },
+    { id: 's3', t: 'Il centro storico è Patrimonio UNESCO dal 2002, con le città tardo barocche del Val di Noto.' },
+    { id: 's4', t: 'La città fu quasi interamente ricostruita dopo il terremoto del 1908.' },
+    { id: 's5', t: 'A luglio, per la festa di San Giacomo, la Scala viene illuminata con migliaia di lumi.' }
+  ]},
+  { titolo: 'Piano di apertura: bottega di ceramiche online', frasi: [
+    { id: 'p1', t: 'Obiettivo: vendere 100 piatti decorati al mese a 25 € l\'uno.' },
+    { id: 'p2', t: 'Il fatturato mensile previsto è quindi di 25.000 €.' },
+    { id: 'p3', t: 'Conviene fotografare bene ogni pezzo, perché il cliente online non può toccarlo.' },
+    { id: 'p4', t: 'Seguendo questo piano il successo è garantito al 100% entro il primo anno.' }
+  ]},
+  { titolo: 'Mail commerciale a un hotel', frasi: [
+    { id: 'm1', t: 'Gentile Direttore, siamo una bottega di ceramica artistica del centro storico di Caltagirone.' },
+    { id: 'm2', t: 'Le proponiamo 50 vasi decorati a mano a 30 € l\'uno, per un totale di 1.200 €.' },
+    { id: 'm3', t: 'Come certificato dall\'UNESCO, la nostra è l\'unica bottega ufficiale della città.' },
+    { id: 'm4', t: 'Possiamo consegnare entro 15 giorni lavorativi e restiamo a disposizione per un incontro in bottega.' }
+  ]}
+];
+const TIPI = ['Fatto falso', 'Numero o calcolo sbagliato', 'Fonte inventata', 'Troppa sicurezza'];
+const DI_GRUPPO = ['caccia', 'progetto'];
+
+/* ===================== STATO LOCALE ===================== */
+const $ = s => document.querySelector(s);
+function carica() { try { return JSON.parse(localStorage.getItem('ws_ia_lavoro2')) || {}; } catch (e) { return {}; } }
+function salva() { try { localStorage.setItem('ws_ia_lavoro2', JSON.stringify(io)); } catch (e) {} }
+let io = carica();
+if (!io.id) io.id = 'P' + Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+if (!io.inviati) io.inviati = {};
+salva();
+
+let S = null;          // ultimo stato dal server
+let offset = 0;        // differenza tra orologio del server e del telefono
+let firma = '';
+let busy = false;
+let modulo = false;    // true mentre è aperto un modulo di gruppo
+const apriComunque = {};
+
+function esc(s) { return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+const API_URL = 'https://script.google.com/macros/s/AKfycbw7LvvKv31_Bbvj3YHr7Y8i1YjXuQ1iqTJt0EuBkltUfS8GMKpGo7eqi-LRWnDpEps/exec';
+function run(fn, ...args) {
+  if (window.google && google.script && google.script.run) {
+    return new Promise((ok, ko) => google.script.run.withSuccessHandler(ok).withFailureHandler(ko)[fn](...args));
+  }
+  return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args }) })
+    .then(r => r.json())
+    .then(j => { if (!j.ok) throw new Error(j.err); return j.v; });
+}
+function msgErr(e) { return String((e && e.message) || e || 'Errore').replace(/^Error:\s*/, ''); }
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2800); }
+function totale() {
+  return Object.keys(io.inviati).reduce((a, k) => a + (DI_GRUPPO.includes(k) ? 0 : (Number(io.inviati[k].punti) || 0)), 0);
+}
+function coriandoli() {
+  const e = ['🎉', '⭐', '🏺', '🍊', '✨', '💡'];
+  for (let i = 0; i < 16; i++) {
+    const s = document.createElement('div'); s.className = 'confetto';
+    s.textContent = e[i % e.length]; s.style.left = Math.random() * 95 + 'vw'; s.style.animationDelay = Math.random() * .4 + 's';
+    document.body.appendChild(s); setTimeout(() => s.remove(), 2200);
+  }
+}
+function header() {
+  $('#chip').innerHTML = io.nome ? esc(io.nome) + ' · <b>' + totale() + '</b> pt' : 'Benvenuto';
+  $('#faseTag').textContent = S ? (TITOLI[S.fase] || '') + (io.gruppo ? ' · ' + io.gruppo : '') : 'Connessione…';
+}
+
+/* ===================== TIMER ===================== */
+setInterval(() => {
+  const el = $('#timer');
+  if (!S || !S.scadenza) { el.style.display = 'none'; return; }
+  const rest = Math.max(0, S.scadenza - (Date.now() + offset));
+  const sec = Math.ceil(rest / 1000);
+  el.style.display = 'inline-block';
+  el.textContent = Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  el.classList.toggle('urg', sec <= 10);
+  const b = $('#qbar');
+  if (b && S.fase === 'quiz') b.style.width = (rest / (S.quizSecondi * 1000) * 100) + '%';
+}, 250);
+
+/* ===================== CICLO ===================== */
+async function tick() {
+  try {
+    const s = await run('getStato');
+    offset = s.ora - Date.now();
+    if (io.sessione !== s.sessione) {               // il relatore ha azzerato: si riparte puliti
+      io.sessione = s.sessione; io.inviati = {}; salva(); firma = '';
+      if (io.nome) run('invia', { id: io.id, nome: io.nome, gruppo: io.gruppo, fase: 'lobby', dati: { parola: io.parola || '' } }).catch(() => {});
+    }
+    S = s;
+    const nuova = [s.fase, s.q, s.qAperta, s.rivela].join('|');
+    if (nuova !== firma) { firma = nuova; render(); }
+    else aggiornaBanner();
+  } catch (e) { /* rete instabile: riprova al prossimo giro */ }
+}
+tick();
+setInterval(tick, 2500);
+
+function consegnatoDa() { return S && S.consegnati ? S.consegnati[io.gruppo] : null; }
+
+function aggiornaBanner() {
+  const b = $('#banner');
+  if (!b || !modulo) return;
+  const chi = consegnatoDa();
+  if (chi && !io.inviati[S.fase]) {
+    b.style.display = 'block';
+    b.innerHTML = `<b>${esc(chi)}</b> ha già consegnato per il gruppo. Se invii anche tu, la tua versione sostituisce la sua.`;
+  }
+}
+
+function render() {
+  if (!S) return;
+  header();
+  window.scrollTo(0, 0);
+  modulo = false;
+  if (!io.nome) return sIscrizione();
+  const f = S.fase;
+  if (DI_GRUPPO.includes(f) && !io.inviati[f] && consegnatoDa() && !apriComunque[f]) return sGruppoConsegnato();
+  if (io.inviati[f] && !['lobby', 'quiz', 'chiusura', 'podio'].includes(f)) return sInviato();
+  const mappa = { lobby: sLobby, quiz: sQuiz, caccia: sCaccia, progetto: sProgetto, voto: sVoto, futuro: sFuturo, chiusura: sChiusura, podio: sPodio };
+  (mappa[f] || sLobby)();
+}
+
+async function manda(dati, btn) {
+  if (busy) return;
+  const f = S.fase;
+  busy = true; btn.disabled = true; const testo = btn.textContent; btn.textContent = 'Invio…';
+  try {
+    const r = await run('invia', { id: io.id, nome: io.nome, gruppo: io.gruppo, fase: f, dati: dati });
+    io.inviati[f] = { punti: r.punti, esito: r.esito, dati: dati };
+    salva(); coriandoli(); render();
+  } catch (e) {
+    toast(msgErr(e)); btn.disabled = false; btn.textContent = testo;
+  } finally { busy = false; }
+}
+
+/* ===================== SCHERMATE ===================== */
+function sIscrizione() {
+  let gruppo = io.gruppo || '';
+  $('#app').innerHTML = `
+    <div class="card">
+      <h2>Ora tocca a voi! 👋</h2>
+      <p class="lead">Mettiamo alla prova quello che abbiamo visto: una sfida lampo, tre laboratori, un podio finale.</p>
+      <label for="nome">Come ti chiami? <span class="hint">(basta il nome)</span></label>
+      <input type="text" id="nome" maxlength="30" autocomplete="given-name" value="${esc(io.nome || '')}">
+      <label>Il tuo gruppo <span class="hint">(te lo indica il relatore)</span></label>
+      <div class="chips" id="gruppi">${GRUPPI.map(g => `<button class="opt ${g === gruppo ? 'on' : ''}" data-g="${g}">${g}</button>`).join('')}</div>
+      <label for="parola">Dopo questo workshop, l'IA per te è… <span class="hint">(una parola)</span></label>
+      <input type="text" id="parola" maxlength="20" placeholder="es. strumento, rischio, opportunità…" value="${esc(io.parola || '')}">
+      <button class="btn" id="vai">Entra</button>
+    </div>`;
+  $('#gruppi').onclick = e => {
+    const b = e.target.closest('[data-g]'); if (!b) return;
+    gruppo = b.dataset.g;
+    document.querySelectorAll('#gruppi .opt').forEach(x => x.classList.toggle('on', x === b));
+  };
+  $('#vai').onclick = async () => {
+    const nome = $('#nome').value.trim();
+    const parola = ($('#parola').value.trim().split(/\s+/)[0] || '').toLowerCase();
+    if (nome.length < 2) return toast('Scrivi il tuo nome');
+    if (!gruppo) return toast('Scegli il tuo gruppo');
+    if (!parola) return toast('Scrivi una parola');
+    const btn = $('#vai'); btn.disabled = true; btn.textContent = 'Un attimo…';
+    try {
+      const r = await run('invia', { id: io.id, nome: nome, gruppo: gruppo, fase: 'lobby', dati: { parola: parola } });
+      io.nome = nome; io.gruppo = gruppo; io.parola = parola; io.inviati.lobby = { punti: r.punti };
+      salva(); coriandoli(); render();
+    } catch (e) { toast(msgErr(e)); btn.disabled = false; btn.textContent = 'Entra'; }
+  };
+}
+
+function sLobby() {
+  $('#app').innerHTML = `
+    <div class="card center">
+      <h2>Ci sei, ${esc(io.nome)}!</h2>
+      <p class="lead">Gruppo <b>${esc(io.gruppo)}</b>. Il tuo nome e la tua parola sono sullo schermo grande.</p>
+      <p style="margin-top:22px"><span class="pulse"></span>Tra poco parte la sfida lampo…</p>
+      <p class="lead">Tieni aperta questa pagina: le attività arrivano da sole.</p>
+    </div>
+    <button class="btn sec" id="cambia">Cambia nome, gruppo o parola</button>`;
+  $('#cambia').onclick = () => { io.nome = ''; salva(); render(); };
+}
+
+/* ---------- Sfida lampo (quiz sincronizzato) ---------- */
+function sQuiz() {
+  const q = S.q;
+  if (q < 0) {
+    $('#app').innerHTML = `
+      <div class="card center">
+        <h2>⚡ Sfida lampo</h2>
+        <p class="lead">${QUIZ.length} affermazioni su quello che abbiamo visto oggi. Vero o falso? Hai <b>${S.quizSecondi} secondi</b> per ognuna.</p>
+        <p class="lead"><b>Più sei veloce, più punti fai.</b></p>
+        <p style="margin-top:20px"><span class="pulse"></span>Guarda lo schermo: arriva la prima domanda</p>
+      </div>`;
+    return;
+  }
+  const mia = io.inviati['quiz' + q];
+  const d = QUIZ[q];
+  if (S.qAperta) {
+    if (mia) {
+      $('#app').innerHTML = `
+        <div class="card center"><div class="tag">Domanda ${q + 1} di ${QUIZ.length}</div>
+          <h2 style="margin-top:8px">Hai risposto ${mia.r ? 'VERO' : 'FALSO'}</h2>
+          <p class="lead">Aspetta la risposta sullo schermo…</p><div class="barra"><i id="qbar"></i></div></div>`;
+      return;
+    }
+    $('#app').innerHTML = `
+      <div class="card">
+        <div class="tag">Domanda ${q + 1} di ${QUIZ.length}</div>
+        <div class="domanda">${esc(d.t)}</div>
+        <div class="barra"><i id="qbar"></i></div>
+        <div class="vf"><button class="v" data-r="1">VERO</button><button class="f" data-r="0">FALSO</button></div>
+      </div>`;
+    document.querySelectorAll('.vf button').forEach(b => b.onclick = async () => {
+      if (busy) return;
+      busy = true;
+      const r = b.dataset.r === '1';
+      document.querySelectorAll('.vf button').forEach(x => { x.disabled = true; x.style.opacity = x === b ? 1 : .35; });
+      try {
+        const res = await run('invia', { id: io.id, nome: io.nome, gruppo: io.gruppo, fase: 'quiz', dati: { q: q, r: r } });
+        io.inviati['quiz' + q] = { r: r, punti: res.punti }; salva();
+      } catch (e) { toast(msgErr(e)); }
+      busy = false;
+      if (S.fase === 'quiz' && S.q === q) render();
+    });
+    return;
+  }
+  // domanda chiusa: risultato
+  const giusta = S.qGiusta;
+  let esito;
+  if (!mia) esito = `<h2>⏱️ Tempo scaduto</h2><p class="lead">La risposta era <b>${giusta ? 'VERO' : 'FALSO'}</b>.</p>`;
+  else if (mia.r === giusta) { esito = `<div class="big">+${mia.punti}</div><h2 style="margin-top:6px">Esatto!</h2>`; coriandoli(); }
+  else esito = `<h2>❌ Non era così</h2><p class="lead">La risposta era <b>${giusta ? 'VERO' : 'FALSO'}</b>.</p>`;
+  header();
+  $('#app').innerHTML = `
+    <div class="card center"><div class="tag">Domanda ${q + 1} di ${QUIZ.length}</div><div style="margin-top:10px">${esito}</div></div>
+    <div class="card"><p style="margin:0;font-size:15px;line-height:1.5">${esc(d.sp)}</p></div>
+    <p class="lead center">${q < QUIZ.length - 1 ? 'Pronto per la prossima…' : 'Sfida finita! Totale: <b>' + totale() + '</b> punti'}</p>`;
+}
+
+/* ---------- Lab 1: Caccia all'errore (di gruppo) ---------- */
+function bannerHtml() { return '<div class="banner" id="banner"></div>'; }
+
+function sGruppoConsegnato() {
+  const chi = consegnatoDa();
+  const f = S.fase;
+  $('#app').innerHTML = `
+    <div class="card center">
+      <h2>✅ Il gruppo ha consegnato</h2>
+      <p class="lead">Ha inviato <b>${esc(chi)}</b> per il gruppo ${esc(io.gruppo)}. I punti valgono per tutti voi.</p>
+      ${f === 'caccia' ? (S.rivela ? '<p class="lead"><b>La soluzione è sullo schermo!</b></p>' : '<p style="margin-top:16px"><span class="pulse"></span>Preparatevi a dire qual è il vostro errore più insidioso</p>')
+                       : '<p style="margin-top:16px"><span class="pulse"></span>Guardate lo schermo grande</p>'}
+    </div>
+    <button class="btn sec" id="apri">Voglio inviare io una versione nuova</button>`;
+  $('#apri').onclick = () => { apriComunque[f] = true; render(); };
+}
+
+function sCaccia() {
+  modulo = true;
+  const sel = {};      // id frase -> tipo
+  let insidioso = '';
+  const testoDi = id => { for (const tx of TESTI) for (const f of tx.frasi) if (f.id === id) return f.t; return ''; };
+  const disegna = () => {
+    const ids = Object.keys(sel);
+    if (insidioso && !(insidioso in sel)) insidioso = '';
+    $('#app').innerHTML = `
+      ${bannerHtml()}
+      <div class="card">
+        <h2>🔎 Caccia all'errore</h2>
+        <p class="lead">Lavorate in gruppo, <b>basta un telefono</b>. Tre testi scritti da un'IA: sembrano perfetti, ma ci sono errori inseriti apposta.
+        Toccate le frasi sbagliate e scegliete il tipo di errore.<br>
+        <b>+100</b> errore trovato · <b>+50</b> tipo giusto · <b>−50</b> frase corretta segnalata.</p>
+      </div>
+      ${TESTI.map(tx => `
+        <div class="card testo"><h3>${esc(tx.titolo)}</h3>
+          ${tx.frasi.map(f => `
+            <button class="frase ${f.id in sel ? 'on' : ''}" data-id="${f.id}">${esc(f.t)}</button>
+            ${f.id in sel ? `<div class="tipi">${TIPI.map(t => `<button class="opt ${sel[f.id] === t ? 'on' : ''}" data-id="${f.id}" data-t="${esc(t)}">${esc(t)}</button>`).join('')}</div>` : ''}
+          `).join('')}
+        </div>`).join('')}
+      <div class="card">
+        <h3>⭐ Il vostro errore più insidioso</h3>
+        <p class="lead">Quello che, secondo voi, ingannerebbe più persone. Lo presenterete alla sala (+50 se è davvero un errore).</p>
+        <select id="insid" style="margin-top:10px">
+          <option value="">${ids.length ? 'Scegliete tra le frasi segnalate…' : 'Prima segnalate almeno una frase'}</option>
+          ${ids.map(id => `<option value="${id}" ${id === insidioso ? 'selected' : ''}>${esc(testoDi(id).slice(0, 70))}…</option>`).join('')}
+        </select>
+      </div>
+      <div class="sticky"><button class="btn" id="invia">Consegna per il gruppo (${ids.length})</button></div>`;
+    aggiornaBanner();
+    document.querySelectorAll('.frase').forEach(b => b.onclick = () => {
+      const id = b.dataset.id; const y = window.scrollY;
+      if (id in sel) delete sel[id]; else sel[id] = '';
+      disegna(); window.scrollTo(0, y);
+    });
+    document.querySelectorAll('.tipi .opt').forEach(b => b.onclick = () => {
+      const y = window.scrollY; sel[b.dataset.id] = b.dataset.t; disegna(); window.scrollTo(0, y);
+    });
+    $('#insid').onchange = e => { insidioso = e.target.value; };
+    $('#invia').onclick = () => {
+      if (!Object.keys(sel).length) return toast('Segnalate almeno una frase');
+      if (!insidioso) return toast('Scegliete il vostro errore più insidioso');
+      manda({ segnalate: sel, insidioso: insidioso }, $('#invia'));
+    };
+  };
+  disegna();
+}
+
+/* ---------- Lab 2: Assistente IA (di gruppo) ---------- */
+function promptAiuto(filiera) {
+  return `Siamo un gruppo in un workshop sul lavoro a Caltagirone (Sicilia).
+Vogliamo progettare un assistente basato sull'intelligenza artificiale che risolva un problema reale del Calatino nella filiera: ${filiera || '[scegliete una filiera]'}.
+
+Proponici 3 idee concrete. Per ognuna indica:
+- il problema che risolve e per chi (destinatari precisi);
+- 3 compiti che l'assistente svolge;
+- quale mansione alleggerisce e che cosa resta compito di una persona;
+- costo di avvio stimato, mesi per partire, clienti realistici nel primo anno.
+Segnala chiaramente quali numeri sono stime da verificare.`;
+}
+
+function sProgetto() {
+  modulo = true;
+  let filiera = '';
+  $('#app').innerHTML = `
+    ${bannerHtml()}
+    <div class="card">
+      <div class="tag">Gruppo ${esc(io.gruppo)} · basta un telefono</div>
+      <h2>«Vorrei fare questo lavoro nel Calatino: pianificazione e investimento»</h2>
+      <p class="lead">Progettate un <b>assistente IA</b> per un problema reale del territorio. Potete usare un'IA sul telefono come aiuto, non come oracolo: <b>i numeri li decidete e li verificate voi.</b></p>
+      <button class="btn sec" id="copiaAiuto">📋 Copia un prompt di aiuto per la vostra IA</button>
+    </div>
+    <div class="card">
+      <label style="margin-top:0">Filiera</label>
+      <div class="chips" id="fil">${FILIERE.map(f => `<button class="opt" data-f="${esc(f)}">${esc(f)}</button>`).join('')}</div>
+      <label for="nome">Nome dell'assistente</label>
+      <input type="text" id="nome" maxlength="40" placeholder="es. Zagara, il consulente dei piccoli agrumicoltori">
+      <label for="problema">Quale problema del Calatino risolve?</label>
+      <textarea id="problema" maxlength="300"></textarea>
+      <label for="perChi">Per chi?</label>
+      <input type="text" id="perChi" maxlength="120" placeholder="destinatari precisi">
+      <label for="compiti">Che cosa fa, concretamente? <span class="hint">(3 compiti)</span></label>
+      <textarea id="compiti" maxlength="300"></textarea>
+      <label for="umano">Che cosa resta compito di una persona?</label>
+      <textarea id="umano" maxlength="200"></textarea>
+      <label>I numeri</label>
+      <div class="grid3">
+        <div><span class="hint">Avvio €</span><input type="number" id="costo" inputmode="numeric" min="0"></div>
+        <div><span class="hint">Mesi</span><input type="number" id="mesi" inputmode="numeric" min="0"></div>
+        <div><span class="hint">Clienti 1° anno</span><input type="number" id="clienti" inputmode="numeric" min="0"></div>
+      </div>
+      <label for="micro">Una domanda per la Fondazione microcredito <span class="hint">(per partire davvero)</span></label>
+      <input type="text" id="micro" maxlength="160" placeholder="es. Chi ci accompagna nel primo anno?">
+    </div>
+    <div class="sticky"><button class="btn" id="invia">Consegna il progetto del gruppo</button></div>`;
+  aggiornaBanner();
+  $('#fil').onclick = e => {
+    const b = e.target.closest('[data-f]'); if (!b) return;
+    filiera = b.dataset.f;
+    document.querySelectorAll('#fil .opt').forEach(x => x.classList.toggle('on', x === b));
+  };
+  $('#copiaAiuto').onclick = () => copia(promptAiuto(filiera));
+  $('#invia').onclick = () => {
+    const v = id => $('#' + id).value.trim();
+    if (!filiera) return toast('Scegliete la filiera');
+    if (!v('nome') || !v('problema') || !v('perChi') || !v('compiti')) return toast('Compilate almeno nome, problema, destinatari e compiti');
+    manda({ filiera: filiera, nome: v('nome'), problema: v('problema'), perChi: v('perChi'), compiti: v('compiti'), umano: v('umano'),
+            costo: +v('costo') || 0, mesi: +v('mesi') || 0, clienti: +v('clienti') || 0, microcredito: v('micro') }, $('#invia'));
+  };
+}
+
+/* ---------- Voto ---------- */
+async function sVoto() {
+  $('#app').innerHTML = '<div class="loader">Carico i progetti degli altri gruppi…</div>';
+  let lista = [];
+  try { lista = (await run('getProgetti')).filter(p => p.gruppo !== io.gruppo); } catch (e) {}
+  if (!S || S.fase !== 'voto') return;
+  if (!lista.length) {
+    $('#app').innerHTML = '<div class="card center"><h2>Ancora nessun progetto</h2><p class="lead">Riprova tra qualche secondo.</p><button class="btn sec" id="rr">Aggiorna</button></div>';
+    $('#rr').onclick = sVoto; return;
+  }
+  let scelto = '';
+  $('#app').innerHTML = `
+    <div class="card"><h2>Se foste la Fondazione microcredito…</h2>
+      <p class="lead">…quale assistente accompagnereste a partire domani? Un voto, non al vostro gruppo.</p></div>
+    <div id="lista">${lista.map(p => `
+      <div class="progetto" data-g="${esc(p.gruppo)}">
+        <div class="tag">Gruppo ${esc(p.gruppo)}${p.filiera ? ' · ' + esc(p.filiera) : ''}</div><br><b>${esc(p.nome)}</b>
+        <p class="lead" style="margin-top:6px">${esc(p.problema)}</p>
+        <p class="lead" style="margin-top:4px"><b>Per:</b> ${esc(p.perChi)}</p>
+      </div>`).join('')}</div>
+    <div class="sticky"><button class="btn" id="invia">Vota</button></div>`;
+  $('#lista').onclick = e => {
+    const c = e.target.closest('[data-g]'); if (!c) return;
+    scelto = c.dataset.g;
+    document.querySelectorAll('.progetto').forEach(x => x.classList.toggle('on', x === c));
+  };
+  $('#invia').onclick = () => { if (!scelto) return toast('Tocca un progetto'); manda({ gruppo: scelto }, $('#invia')); };
+}
+
+/* ---------- Lab 3: Il mio futuro lavoro ---------- */
+function sFuturo() {
+  $('#app').innerHTML = `
+    <div class="card">
+      <h2>Il mio futuro lavoro</h2>
+      <p class="lead">Scegli una professione che vuoi esplorare. Ricevi un <b>prompt pronto</b> per costruire la tua scheda con un'IA e lo schema da ricopiare a mano.</p>
+      <label for="prof">La professione</label>
+      <input type="text" id="prof" maxlength="60" placeholder="es. guida turistica digitale, ceramista con e-commerce…">
+      <label for="fil">Il settore</label>
+      <select id="fil"><option value="">Scegli…</option>${FILIERE.map(f => `<option>${esc(f)}</option>`).join('')}<option>Altro</option></select>
+      <label for="ia">In che cosa l'IA potrebbe aiutarti in quel lavoro?</label>
+      <textarea id="ia" maxlength="200"></textarea>
+      <label for="comp">Una competenza che ti manca ancora</label>
+      <input type="text" id="comp" maxlength="80">
+      <label for="frase">Per il muro finale: <b>quale lavoro voglio costruire qui?</b> <span class="hint">(una frase)</span></label>
+      <textarea id="frase" maxlength="160"></textarea>
+    </div>
+    <div class="sticky"><button class="btn" id="invia">Crea la mia scheda</button></div>`;
+  $('#invia').onclick = () => {
+    const v = id => $('#' + id).value.trim();
+    if (!v('prof') || !v('fil')) return toast('Scrivi la professione e scegli il settore');
+    if (v('frase').length < 5) return toast('Scrivi la tua frase per il muro');
+    manda({ professione: v('prof'), settore: v('fil'), iaAiuta: v('ia'), competenza: v('comp'), frase: v('frase') }, $('#invia'));
+  };
+}
+
+function promptFuturo(d) {
+  return `Agisci come orientatore al lavoro esperto del territorio di Caltagirone (Sicilia).
+Voglio esplorare la professione di: ${d.professione}, nel settore: ${d.settore}.
+Penso che l'IA possa aiutarmi a: ${d.iaAiuta || '-'}.
+Una competenza che mi manca: ${d.competenza || '-'}.
+
+Preparami una scheda di massimo 250 parole con:
+1) che cosa fa questa figura in una giornata tipo;
+2) quali mansioni l'IA sta trasformando e quali restano umane;
+3) le 3 competenze chiave;
+4) un percorso formativo realistico;
+5) tre primi passi concreti da fare nel Calatino entro un mese.
+Alla fine elenca le informazioni della scheda che dovrei verificare perché potresti sbagliarti.`;
+}
+
+function sChiusura() {
+  $('#app').innerHTML = `
+    <div class="card center">
+      <h2>🧱 Il muro</h2>
+      <p class="lead">Non «l'IA mi toglierà il lavoro?», ma:</p>
+      <h3 style="margin-top:12px;font-size:21px">«Quale lavoro voglio costruire, e quali strumenti mi servono per farlo qui?»</h3>
+      <p style="margin-top:18px"><span class="pulse"></span>Le vostre frasi sono sullo schermo</p>
+    </div>`;
+}
+
+async function sPodio() {
+  $('#app').innerHTML = '<div class="loader">Calcolo il tuo punteggio…</div>';
+  let r = null;
+  try { r = await run('mioPunteggio', io.id); } catch (e) {}
+  if (!S || S.fase !== 'podio') return;
+  $('#app').innerHTML = `
+    <div class="card center">
+      <p class="lead">Il tuo punteggio, compresi i punti del gruppo</p>
+      <div class="big">${r ? r.totale : totale()}</div>
+      ${r && r.posizione ? `<p class="lead">Sei <b>${r.posizione}°</b> su ${r.su}</p>` : ''}
+      <h2 style="margin-top:18px">👀 Guarda lo schermo: arriva il podio!</h2>
+    </div>`;
+  coriandoli();
+}
+
+/* ===================== DOPO L'INVIO ===================== */
+function sInviato() {
+  const f = S.fase;
+  const x = io.inviati[f];
+  const diGruppo = DI_GRUPPO.includes(f);
+  let extra = '';
+  if (f === 'caccia' && x.esito) {
+    if (!S.rivela) {
+      extra = `<div class="card center"><h3>Avete segnalato ${Object.keys(x.dati.segnalate || {}).length} frasi</h3>
+        <p class="lead">La soluzione la sveliamo insieme sullo schermo. Preparate il vostro errore più insidioso!</p></div>`;
+    } else {
+      const det = x.esito.dettaglio;
+      extra = `<div class="card"><h3>Avete trovato ${x.esito.trovati} errori su ${x.esito.totali}</h3>
+        ${TESTI.map(tx => tx.frasi.map(fr => {
+          const d = det[fr.id];
+          if (!d) return '';
+          if (d.esito === 'trovato') return `<div class="esito ok">✓ <b>Trovato!</b> ${esc(fr.t)}<small>${esc(d.nota)} ${d.tipoOk ? '· tipo giusto' : '· tipo atteso: ' + esc(d.tipi.join(' / '))}</small></div>`;
+          if (d.esito === 'mancato') return `<div class="esito mm">⚠ <b>Vi è sfuggito:</b> ${esc(fr.t)}<small>${esc(d.nota)}</small></div>`;
+          return `<div class="esito ko">✗ <b>Era corretta:</b> ${esc(fr.t)}</div>`;
+        }).join('')).join('')}</div>`;
+    }
+  }
+  if (f === 'futuro' && x.dati) {
+    const d = x.dati;
+    extra = `
+      <div class="card"><h3>📋 Il prompt per la tua scheda</h3>
+        <p class="lead">Copialo e incollalo in un'IA (Claude, ChatGPT, Gemini…). Poi controlla quello che ti risponde!</p>
+        <div class="prompt">${esc(promptFuturo(d))}</div>
+        <button class="btn" id="copia">Copia il prompt</button></div>
+      <div class="card scheda"><h3>✍️ Da ricopiare a mano</h3><dl>
+        <dt>Professione</dt><dd>${esc(d.professione)}</dd>
+        <dt>Settore</dt><dd>${esc(d.settore)}</dd>
+        <dt>L'IA mi aiuterà a</dt><dd>${esc(d.iaAiuta || '…')}</dd>
+        <dt>Devo imparare</dt><dd>${esc(d.competenza || '…')}</dd>
+        <dt>Il primo passo che farò questa settimana</dt><dd>…………………………………</dd></dl></div>
+      <div class="card center"><h3>👥 Ora confrontati con chi hai accanto</h3><p class="lead">Leggetevi le schede a vicenda: che cosa aggiungereste?</p></div>`;
+  }
+  $('#app').innerHTML = `
+    <div class="card center">
+      <p class="lead">${diGruppo ? 'Consegnato per il gruppo ' + esc(io.gruppo) + '!' : 'Inviato!'}</p>
+      <div class="big">+${x.punti}</div>
+      <p class="lead">${diGruppo ? 'punti a ogni membro del gruppo' : 'punti · totale <b>' + totale() + '</b>'}</p>
+      <p style="margin-top:14px"><span class="pulse"></span>Guarda lo schermo grande</p>
+    </div>
+    ${extra}
+    ${f === 'caccia' && S.rivela ? '' : '<button class="btn sec" id="modifica">Modifica la consegna</button>'}`;
+  const m = $('#modifica');
+  if (m) m.onclick = () => { delete io.inviati[f]; apriComunque[f] = true; salva(); render(); };
+  const c = $('#copia');
+  if (c) c.onclick = () => copia(promptFuturo(x.dati));
+}
+
+function copia(t) {
+  const fallback = () => {
+    const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Copiato! Incollalo nella tua IA'); } catch (e) { toast('Tieni premuto sul testo per copiarlo'); }
+    ta.remove();
+  };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiato! Incollalo nella tua IA'), fallback);
+  else fallback();
+}
+</script>
+</body>
+</html>

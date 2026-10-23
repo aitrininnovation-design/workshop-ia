@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<title>Proiettore · IA &amp; Lavoro</title>
+<meta name="robots" content="noindex">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root{
+    --bg:#0F1B2D; --bg2:#16263F; --panel:#1C3150; --line:#2B4469; --ink:#F4F1EA; --muted:#9FB0C8;
+    --blu:#2E6FC0; --terra:#E0694F; --giallo:#F2B134; --verde:#36B37E; --rosso:#E5533D; --crema:#FBF6EE;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden}
+  h1,h2,h3{font-family:'Bricolage Grotesque',Inter,sans-serif;margin:0}
+  #wrap{display:grid;grid-template-rows:auto 1fr auto;height:100vh}
+  .bar{display:flex;align-items:center;gap:14px;padding:10px 22px;
+       background:radial-gradient(circle at 10px 10px,rgba(242,177,52,.35) 3px,transparent 4px) 0 0/20px 20px,linear-gradient(90deg,#1F4E8C,#2E6FC0)}
+  .bar h1{font-size:19px;white-space:nowrap}
+  .fasi{display:flex;gap:6px;flex-wrap:wrap;flex:1}
+  .fasi button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;
+               padding:6px 12px;font:inherit;font-size:12.5px;font-weight:600;cursor:pointer}
+  .fasi button.on{background:var(--giallo);color:#1D2433;border-color:var(--giallo)}
+  .count{font-family:'Bricolage Grotesque';font-weight:800;font-size:20px;white-space:nowrap}
+  .count small{font-family:Inter;font-weight:500;font-size:12px;opacity:.85}
+  .timer{font-family:'Bricolage Grotesque';font-weight:800;font-size:30px;background:var(--giallo);color:#1D2433;border-radius:12px;
+         padding:2px 14px;display:none;min-width:96px;text-align:center}
+  .timer.urg{background:var(--rosso);color:#fff;animation:batti 1s infinite}
+  @keyframes batti{50%{transform:scale(1.07)}}
+  #stage{overflow:auto;padding:24px 30px;position:relative}
+  .foot{display:flex;gap:10px;align-items:center;padding:10px 22px;background:var(--bg2);border-top:1px solid var(--line);flex-wrap:wrap}
+  .foot button{border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 14px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  .foot button.pri{background:var(--terra);border-color:var(--terra);font-size:15px;padding:10px 18px}
+  .foot .sp{flex:1}
+  .foot .stato{font-size:12.5px;color:var(--muted)}
+  .titolo{font-size:44px;line-height:1.1}
+  .sotto{color:var(--muted);font-size:20px;margin-top:8px}
+  .grid{display:grid;gap:18px}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:20px}
+  .qr{background:#fff;border-radius:18px;padding:14px;display:inline-block}
+  .qr img{display:block}
+  .url{font-size:14px;color:var(--muted);word-break:break-all;margin-top:10px}
+  .colG h3{font-size:20px;color:var(--giallo);margin-bottom:10px}
+  .nome{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:8px 12px;font-size:19px;font-weight:600;margin-bottom:8px}
+  .nuovo{animation:pop .6s ease}
+  @keyframes pop{0%{transform:scale(.4);opacity:0}70%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+  .cloud{display:flex;flex-wrap:wrap;gap:4px 22px;align-items:center;justify-content:center;padding:10px}
+  .cloud span{font-family:'Bricolage Grotesque';font-weight:800;line-height:1.05}
+  .domanda{font-family:'Bricolage Grotesque';font-weight:800;font-size:54px;line-height:1.15;max-width:1400px}
+  .numerone{font-family:'Bricolage Grotesque';font-weight:800;font-size:150px;line-height:1;color:var(--giallo)}
+  .vfris{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:24px}
+  .vfris .box{border-radius:20px;padding:20px 24px;font-size:26px;font-weight:700;opacity:.4}
+  .vfris .box.giusta{opacity:1;box-shadow:0 0 0 5px var(--giallo)}
+  .vfris .box b{display:block;font-family:'Bricolage Grotesque';font-size:64px}
+  .riga{display:flex;align-items:center;gap:14px;margin:10px 0;font-size:18px}
+  .riga .lab{flex:1}
+  .riga .pct{font-family:'Bricolage Grotesque';font-weight:800;font-size:26px;min-width:80px;text-align:right}
+  .barra{height:16px;border-radius:99px;background:rgba(255,255,255,.1);overflow:hidden;margin-top:6px}
+  .barra i{display:block;height:100%;border-radius:99px;transition:width .8s}
+  .badges{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+  .badge{border-radius:999px;padding:8px 16px;font-weight:700;font-size:17px;background:rgba(255,255,255,.08);border:1px solid var(--line)}
+  .badge.ok{background:var(--verde);border-color:var(--verde)}
+  .frase{display:flex;gap:12px;align-items:center;padding:8px 12px;border-radius:12px;margin:5px 0;font-size:16.5px;background:rgba(255,255,255,.04)}
+  .frase .n{font-family:'Bricolage Grotesque';font-weight:800;font-size:24px;min-width:42px;text-align:center}
+  .frase.err{background:rgba(229,83,61,.2);border-left:5px solid var(--rosso)}
+  .frase.giusta{opacity:.5}
+  .frase .nota{display:block;font-size:13.5px;color:var(--giallo);margin-top:3px}
+  .post{background:var(--crema);color:#1D2433;border-radius:12px;padding:12px;margin-bottom:10px;font-size:15px;line-height:1.35;box-shadow:0 3px 0 rgba(0,0,0,.25)}
+  .post b{color:#C8553D}
+  .post .u{display:block;margin-top:6px;color:#1F4E8C;font-weight:600}
+  .pg h2{font-size:26px}
+  .tagg{display:inline-block;background:var(--giallo);color:#1D2433;font-weight:800;font-size:12px;letter-spacing:.06em;text-transform:uppercase;border-radius:6px;padding:4px 8px;margin-bottom:8px}
+  .pg dl{margin:8px 0 0}
+  .pg dt{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-top:8px}
+  .pg dd{margin:2px 0 0;font-size:15.5px;line-height:1.35}
+  .num{display:flex;gap:10px;margin-top:12px}
+  .num div{flex:1;background:rgba(255,255,255,.06);border-radius:10px;padding:8px;text-align:center}
+  .num b{display:block;font-family:'Bricolage Grotesque';font-size:22px}
+  .num span{font-size:11px;color:var(--muted)}
+  .muro{columns:3;column-gap:18px}
+  .muro .post{break-inside:avoid;font-size:20px;font-family:'Bricolage Grotesque';font-weight:600}
+  .podio{display:flex;align-items:flex-end;justify-content:center;gap:20px;margin-top:20px}
+  .gradino{width:230px;text-align:center}
+  .gradino .blocco{border-radius:16px 16px 0 0;display:flex;align-items:flex-start;justify-content:center;padding-top:14px;font-family:'Bricolage Grotesque';font-weight:800;font-size:54px;color:#1D2433}
+  .gradino .chi{font-family:'Bricolage Grotesque';font-weight:800;font-size:28px;margin-bottom:6px}
+  .gradino .pt{color:var(--muted);margin-bottom:10px;font-size:18px}
+  .login{max-width:360px;margin:12vh auto;text-align:center}
+  .login input{width:100%;font:inherit;font-size:28px;text-align:center;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--ink);margin:16px 0}
+  .login button{width:100%;padding:14px;border:0;border-radius:12px;background:var(--terra);color:#fff;font:inherit;font-size:18px;font-weight:700;cursor:pointer}
+  .vuoto{color:var(--muted);font-size:20px;padding:20px 0}
+  .toast{position:fixed;right:22px;bottom:76px;background:var(--giallo);color:#1D2433;padding:12px 18px;border-radius:12px;font-weight:700;opacity:0;transition:.25s;pointer-events:none}
+  .toast.on{opacity:1}
+  #qrHidden{position:absolute;left:-9999px;top:0}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <div class="bar">
+    <h1>IA &amp; Lavoro · Calatino</h1>
+    <div class="fasi" id="fasi"></div>
+    <div class="timer" id="timer"></div>
+    <div class="count" id="count">0 <small>connessi</small></div>
+  </div>
+  <div id="stage"></div>
+  <div class="foot">
+    <button id="prev">◀</button>
+    <button id="next" class="pri">Avanti ▶</button>
+    <button id="piu">+1 min</button>
+    <span class="stato" id="stato"></span>
+    <span class="sp"></span>
+    <button id="claudeFase">🤖 Copia per Claude</button>
+    <button id="claudeTutto">🤖 Copia tutto</button>
+    <button id="full">⛶</button>
+    <button id="reset">Azzera</button>
+  </div>
+</div>
+<div id="qrHidden"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+// Link per i partecipanti: quello di Apps Script se la pagina è servita da Google, altrimenti la cartella del sito
+const URL_APP = (function () {
+  const t = '<?= urlApp ?>';
+  return t.indexOf('<' + '?') === 0 ? location.href.replace(/[^/]*([?#].*)?$/, '') : t;
+})();
+const FASI = ['lobby', 'quiz', 'caccia', 'progetto', 'voto', 'futuro', 'chiusura', 'podio'];
+const NOMI_FASI = { lobby: 'Accesso', quiz: 'Sfida lampo', caccia: 'Caccia errore', progetto: 'Assistente IA', voto: 'Voto',
+                    futuro: 'Futuro lavoro', chiusura: 'Muro', podio: 'Podio' };
+const GRUPPI = ['Scala', 'Ceramica', 'Luminaria', 'Terracotta', 'Zagara'];
+const QUIZ = [
+  { t: 'L\'IA capisce il significato delle parole che usa.', sp: 'Calcola la probabilità delle associazioni tra parole: è un «pappagallo stocastico».' },
+  { t: 'L\'IA è lo specchio di ciò che è stato messo in rete, fake news comprese.', sp: 'Impara dai dati che riceve: se i dati sono sbagliati o parziali, lo sarà anche lei.' },
+  { t: 'La foto del Papa con il piumino bianco che girò sui social nel 2023 era vera.', sp: 'Era un\'immagine generata con l\'IA: la realtà oggi si manipola in pochi secondi.' },
+  { t: 'L\'IA sa spiegare anche eventi che non si sono mai visti nei dati.', sp: 'Lavora sulle frequenze: davanti all\'imprevedibile serve l\'intelligenza umana.' },
+  { t: 'Saper fare buone domande a un chatbot conta più della tecnica informatica.', sp: 'È l\'arte di dialogare: chiedere approfondimenti, esempi e correlazioni.' },
+  { t: 'Se prendo una decisione con l\'aiuto dell\'IA, la responsabilità resta mia.', sp: 'Giudizio e responsabilità restano propri dell\'essere umano.' },
+  { t: 'Con l\'IA spariscono interi mestieri, non singole mansioni.', sp: 'Sono le mansioni a spostarsi: chi le conosce governa il cambiamento.' },
+  { t: 'Nel microcredito la parte più importante è il denaro prestato.', sp: 'Il denaro è la parte più piccola: contano accompagnamento, relazione e fiducia in sé.' }
+];
+const TESTI = [
+  { titolo: 'Scheda turistica su Caltagirone', frasi: [
+    ['s1', 'Caltagirone è conosciuta nel mondo per la ceramica, lavorata qui da secoli.'],
+    ['s2', 'La Scala di Santa Maria del Monte conta 1.420 gradini decorati in maiolica.'],
+    ['s3', 'Centro storico Patrimonio UNESCO dal 2002, con le città tardo barocche del Val di Noto.'],
+    ['s4', 'La città fu quasi interamente ricostruita dopo il terremoto del 1908.'],
+    ['s5', 'A luglio, per San Giacomo, la Scala viene illuminata con migliaia di lumi.'] ] },
+  { titolo: 'Piano di apertura: bottega online', frasi: [
+    ['p1', 'Obiettivo: vendere 100 piatti decorati al mese a 25 € l\'uno.'],
+    ['p2', 'Il fatturato mensile previsto è quindi di 25.000 €.'],
+    ['p3', 'Conviene fotografare bene ogni pezzo: il cliente online non può toccarlo.'],
+    ['p4', 'Seguendo questo piano il successo è garantito al 100% entro il primo anno.'] ] },
+  { titolo: 'Mail commerciale a un hotel', frasi: [
+    ['m1', 'Gentile Direttore, siamo una bottega di ceramica artistica del centro storico.'],
+    ['m2', 'Le proponiamo 50 vasi a 30 € l\'uno, per un totale di 1.200 €.'],
+    ['m3', 'Come certificato dall\'UNESCO, la nostra è l\'unica bottega ufficiale della città.'],
+    ['m4', 'Consegna entro 15 giorni lavorativi; restiamo a disposizione per un incontro.'] ] }
+];
+const TUTTE_FRASI = TESTI.flatMap(t => t.frasi);
+const COLORI = ['#F2B134', '#E0694F', '#36B37E', '#6FA8F5', '#F4F1EA', '#C79BF2'];
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const API_URL = 'https://script.google.com/macros/s/AKfycbw7LvvKv31_Bbvj3YHr7Y8i1YjXuQ1iqTJt0EuBkltUfS8GMKpGo7eqi-LRWnDpEps/exec';
+function run(fn, ...args) {
+  if (window.google && google.script && google.script.run) {
+    return new Promise((ok, ko) => google.script.run.withSuccessHandler(ok).withFailureHandler(ko)[fn](...args));
+  }
+  return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify({ fn: fn, args: args }) })
+    .then(r => r.json())
+    .then(j => { if (!j.ok) throw new Error(j.err); return j.v; });
+}
+const msgErr = e => String((e && e.message) || e).replace(/^Error:\s*/, '');
+function toast(t) { const el = $('#toast'); el.textContent = t; el.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('on'), 2500); }
+
+let PIN = '';
+try { PIN = sessionStorage.getItem('pin_ws2') || ''; } catch (e) {}
+let D = null, A = null, offset = 0;
+const visti = new Set();
+let qrSrc = '', timer = null, occupato = false, chiudendo = false;
+
+/* ---------- QR ---------- */
+function qr(px) {
+  if (!qrSrc && typeof QRCode !== 'undefined') {
+    const box = $('#qrHidden');
+    new QRCode(box, { text: URL_APP, width: 512, height: 512, correctLevel: QRCode.CorrectLevel.M });
+    const c = box.querySelector('canvas');
+    if (c) qrSrc = c.toDataURL('image/png');
+  }
+  return qrSrc ? `<div class="qr"><img src="${qrSrc}" width="${px}" height="${px}" alt="QR code per entrare"></div>` : '';
+}
+
+/* ---------- LOGIN ---------- */
+function login(errore) {
+  clearInterval(timer);
+  $('#stage').innerHTML = `
+    <div class="login"><h2 style="font-size:32px">Vista relatore</h2>
+      <p style="color:var(--muted)">${errore ? esc(errore) : 'Inserisci il PIN impostato nello script'}</p>
+      <input type="password" id="pin" inputmode="numeric" autofocus><button id="entra">Entra</button></div>`;
+  const vai = async () => {
+    const p = $('#pin').value.trim();
+    try { await run('verificaPin', p); PIN = p; try { sessionStorage.setItem('pin_ws2', p); } catch (e) {} avvia(); }
+    catch (e) { login('PIN errato, riprova'); }
+  };
+  $('#entra').onclick = vai;
+  $('#pin').onkeydown = e => { if (e.key === 'Enter') vai(); };
+}
+
+function avvia() { aggiorna(); clearInterval(timer); timer = setInterval(aggiorna, 2000); }
+
+async function aggiorna() {
+  try {
+    D = await run('datiProiettore', PIN);
+    offset = D.stato.ora - Date.now();
+    A = analizza(D.righe);
+    $('#stato').textContent = 'Aggiornato ' + new Date().toLocaleTimeString('it-IT');
+    disegna();
+  } catch (e) {
+    const m = msgErr(e);
+    if (/PIN/.test(m)) { try { sessionStorage.removeItem('pin_ws2'); } catch (x) {} login('PIN non valido'); }
+    else $('#stato').textContent = 'Connessione instabile… (' + m + ')';
+  }
+}
+
+/* ---------- TIMER e chiusura automatica del quiz ---------- */
+setInterval(() => {
+  const el = $('#timer');
+  if (!D || !D.stato.scadenza) { el.style.display = 'none'; return; }
+  const rest = Math.max(0, D.stato.scadenza - (Date.now() + offset));
+  const sec = Math.ceil(rest / 1000);
+  el.style.display = 'block';
+  el.textContent = D.stato.fase === 'quiz' ? sec : Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0');
+  el.classList.toggle('urg', sec <= 10);
+  const big = $('#numerone');
+  if (big) big.textContent = sec;
+  if (D.stato.fase === 'quiz' && D.stato.qAperta && rest <= 0 && !chiudendo) {
+    chiudendo = true;
+    azione('chiudiDomanda').finally(() => { chiudendo = false; });
+  }
+}, 250);
+
+/* ---------- ANALISI ---------- */
+function analizza(righe) {
+  const per = f => righe.filter(r => r.fase === f);
+  const persone = {};
+  righe.forEach(r => { persone[r.id] = { nome: r.nome, gruppo: r.gruppo, id: r.id }; });
+  const progetti = {};
+  per('progetto').forEach(r => { progetti[r.gruppo] = r.dati; });
+  const cacce = {};
+  per('caccia').forEach(r => { cacce[r.gruppo] = r; });
+  const voti = {};
+  per('voto').forEach(r => { const g = r.dati.gruppo; if (g) voti[g] = (voti[g] || 0) + 1; });
+  return { per, persone, progetti, cacce, voti, punteggi: D.punteggi };
+}
+
+function nuovo(k) { if (visti.has(k)) return ''; visti.add(k); return 'nuovo'; }
+function nConnessi() { return Object.keys(A.persone).length; }
+
+/* ---------- DISEGNO ---------- */
+function etichettaAvanti() {
+  const s = D.stato;
+  if (s.fase === 'quiz') {
+    if (s.q < 0) return 'Prima domanda ▶';
+    if (s.qAperta) return 'Mostra risposta';
+    if (s.q < QUIZ.length - 1) return 'Domanda ' + (s.q + 2) + ' ▶';
+  }
+  if (s.fase === 'caccia' && !s.rivela) return 'Rivela la soluzione';
+  const i = FASI.indexOf(s.fase);
+  return i < FASI.length - 1 ? NOMI_FASI[FASI[i + 1]] + ' ▶' : 'Fine';
+}
+
+function disegna() {
+  const s = D.stato;
+  $('#fasi').innerHTML = FASI.map(f => `<button class="${f === s.fase ? 'on' : ''}" data-f="${f}">${NOMI_FASI[f]}</button>`).join('');
+  let extra = '';
+  if (s.fase === 'quiz' && s.q >= 0) extra = ` · ${A.per('quiz').filter(r => r.dati.q === s.q).length} risposte`;
+  if (s.fase === 'futuro' || s.fase === 'voto') extra = ` · ${new Set(A.per(s.fase).map(r => r.id)).size} risposte`;
+  $('#count').innerHTML = `${nConnessi()} <small>connessi${extra}</small>`;
+  $('#next').textContent = etichettaAvanti();
+  $('#piu').style.display = ['caccia', 'progetto', 'voto', 'futuro'].includes(s.fase) ? '' : 'none';
+  const f = { lobby: vLobby, quiz: vQuiz, caccia: vCaccia, progetto: vProgetto, voto: vVoto, futuro: vFuturo, chiusura: vChiusura, podio: vPodio }[s.fase];
+  $('#stage').innerHTML = f ? f() : '';
+}
+
+function badgesConsegne(fase) {
+  const c = D.stato.consegnati || {};
+  const presenti = GRUPPI.filter(g => Object.values(A.persone).some(p => p.gruppo === g));
+  return `<div class="badges">${presenti.map(g => `<span class="badge ${c[g] ? 'ok' : ''}">${c[g] ? '✓ ' : ''}${esc(g)}</span>`).join('')}</div>`;
+}
+
+function vLobby() {
+  const conta = {};
+  A.per('lobby').forEach(r => { const w = String(r.dati.parola || '').trim(); if (w) conta[w] = (conta[w] || 0) + 1; });
+  const parole = Object.entries(conta).sort((a, b) => b[1] - a[1]);
+  const max = parole.length ? parole[0][1] : 1;
+  const ps = Object.values(A.persone);
+  return `
+    <div class="grid" style="grid-template-columns:auto 1fr;align-items:start">
+      <div style="text-align:center">${qr(340)}<div class="url">${esc(URL_APP)}</div></div>
+      <div>
+        <div class="titolo">Ora tocca a voi: inquadrate il QR</div>
+        <div class="sotto">Nome, gruppo e una parola: «dopo questo workshop, l'IA per me è…»</div>
+        <div class="panel" style="margin-top:18px;min-height:150px">
+          <div class="cloud">${parole.map(([w, c], i) => `<span class="${nuovo('w' + w)}" style="font-size:${22 + (c / max) * 50}px;color:${COLORI[i % COLORI.length]}">${esc(w)}</span>`).join('') || '<span class="vuoto">Le vostre parole compariranno qui</span>'}</div>
+        </div>
+        <div class="grid" style="grid-template-columns:repeat(5,1fr);margin-top:18px">
+          ${GRUPPI.map(g => `<div class="colG"><h3>${g} <small style="color:var(--muted)">${ps.filter(p => p.gruppo === g).length}</small></h3>
+            ${ps.filter(p => p.gruppo === g).map(p => `<div class="nome ${nuovo('n' + p.id)}">${esc(p.nome)}</div>`).join('')}</div>`).join('')}
+        </div>
+      </div>
+    </div>`;
+}
+
+function classificaQuiz() {
+  const t = {};
+  A.per('quiz').forEach(r => { t[r.id] = (t[r.id] || 0) + r.punti; });
+  return Object.entries(t).map(([id, p]) => ({ nome: (A.persone[id] || {}).nome || '?', punti: p })).sort((a, b) => b.punti - a.punti);
+}
+
+function vQuiz() {
+  const s = D.stato;
+  if (s.q < 0) return `
+    <div class="grid" style="grid-template-columns:1fr auto;align-items:center;height:100%">
+      <div><div class="titolo" style="font-size:72px">⚡ Sfida lampo</div>
+        <div class="sotto" style="font-size:28px">${QUIZ.length} affermazioni su tutto quello che abbiamo visto. Vero o falso?<br>
+        ${s.quizSecondi} secondi a domanda. <b style="color:var(--giallo)">Più siete veloci, più punti fate.</b></div></div>
+      <div style="text-align:center">${qr(240)}<div class="url">Chi non è entrato inquadri qui</div></div></div>`;
+  const d = QUIZ[s.q];
+  const risp = A.per('quiz').filter(r => r.dati.q === s.q);
+  if (s.qAperta) return `
+    <div class="sotto" style="margin:0 0 14px">Domanda ${s.q + 1} di ${QUIZ.length}</div>
+    <div class="domanda">${esc(d.t)}</div>
+    <div class="grid" style="grid-template-columns:auto 1fr;align-items:center;margin-top:30px">
+      <div class="numerone" id="numerone"></div>
+      <div class="sotto" style="font-size:30px">${risp.length} su ${nConnessi()} hanno risposto</div></div>`;
+  const giusta = D.chiave.quiz[s.q];
+  const nv = risp.filter(r => r.dati.r === true).length, nf = risp.length - nv, tot = risp.length || 1;
+  const top = classificaQuiz().slice(0, 5);
+  return `
+    <div class="sotto" style="margin:0 0 10px">Domanda ${s.q + 1} di ${QUIZ.length}</div>
+    <div class="domanda" style="font-size:42px">${esc(d.t)}</div>
+    <div class="grid" style="grid-template-columns:2fr 1fr;margin-top:6px">
+      <div>
+        <div class="vfris">
+          <div class="box ${giusta ? 'giusta' : ''}" style="background:var(--verde)">VERO<b>${Math.round(nv / tot * 100)}%</b></div>
+          <div class="box ${!giusta ? 'giusta' : ''}" style="background:var(--rosso)">FALSO<b>${Math.round(nf / tot * 100)}%</b></div>
+        </div>
+        <div class="panel" style="margin-top:18px;font-size:24px;line-height:1.4">💡 ${esc(d.sp)}</div>
+      </div>
+      <div class="panel"><h3 style="color:var(--giallo);margin-bottom:6px">⚡ Classifica della sfida</h3>
+        ${top.map((x, i) => `<div class="riga"><div class="lab">${i + 1}. ${esc(x.nome)}</div><div class="pct">${x.punti}</div></div>`).join('') || '<div class="vuoto">Nessuno ha ancora fatto punti</div>'}</div>
+    </div>`;
+}
+
+function vCaccia() {
+  const s = D.stato;
+  const chiave = D.chiave.caccia;
+  const cont = {};
+  Object.values(A.cacce).forEach(r => Object.keys(r.dati.segnalate || {}).forEach(id => { cont[id] = (cont[id] || 0) + 1; }));
+  const nG = Object.keys(A.cacce).length;
+  const errori = Object.keys(chiave);
+  const meno = errori.slice().sort((a, b) => (cont[a] || 0) - (cont[b] || 0))[0];
+  const testo = id => (TUTTE_FRASI.find(f => f[0] === id) || ['', ''])[1];
+  const blocco = tx => `<div class="panel"><h3 style="margin-bottom:6px;font-size:18px">${esc(tx.titolo)}</h3>
+    ${tx.frasi.map(([id, t]) => {
+      const err = !!chiave[id];
+      return `<div class="frase ${s.rivela ? (err ? 'err' : 'giusta') : ''}"><div class="n">${cont[id] || 0}</div>
+        <div>${esc(t)}${s.rivela && err ? `<span class="nota">${esc(chiave[id].tipi.join(' / '))} — ${esc(chiave[id].nota)}${id === meno ? ' · ⭐ IL MENO TROVATO' : ''}</span>` : ''}</div></div>`;
+    }).join('')}</div>`;
+  const insidiosi = s.rivela ? `
+    <div class="panel" style="margin-top:18px"><h3 style="color:var(--giallo);margin-bottom:8px">⭐ L'errore più insidioso secondo ogni gruppo</h3>
+      <div class="grid" style="grid-template-columns:repeat(${Math.max(1, Math.min(nG, 5))},1fr)">
+        ${Object.entries(A.cacce).map(([g, r]) => {
+          const ok = !!chiave[r.dati.insidioso];
+          const trov = errori.filter(id => (r.dati.segnalate || {})[id] !== undefined).length;
+          return `<div class="post"><b>${esc(g)}</b> · ${trov}/${errori.length} errori · ${r.punti} pt<br>${ok ? '✓' : '✗'} «${esc(testo(r.dati.insidioso))}»</div>`;
+        }).join('')}</div></div>` : '';
+  return `
+    <div class="grid" style="grid-template-columns:1fr auto;align-items:end">
+      <div><div class="titolo">🔎 Caccia all'errore</div>
+        <div class="sotto">${s.rivela ? 'Ecco la soluzione. Ogni gruppo: qual è il vostro errore più insidioso, e perché?' : 'Il numero indica quanti gruppi hanno segnalato la frase. ' + nG + ' consegne.'}</div></div>
+      ${badgesConsegne('caccia')}</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr 1fr;margin-top:16px">${TESTI.map(blocco).join('')}</div>
+    ${insidiosi}`;
+}
+
+function cardProgetto(g, d, extra) {
+  return `<div class="panel pg ${nuovo('p' + g + (d.nome || ''))}">
+    <div class="tagg">Gruppo ${esc(g)}${d.filiera ? ' · ' + esc(d.filiera) : ''}</div>${extra || ''}
+    <h2>${esc(d.nome)}</h2>
+    <dl><dt>Problema</dt><dd>${esc(d.problema)}</dd><dt>Per chi</dt><dd>${esc(d.perChi)}</dd>
+        <dt>Che cosa fa</dt><dd>${esc(d.compiti)}</dd>${d.umano ? `<dt>Resta umano</dt><dd>${esc(d.umano)}</dd>` : ''}
+        ${d.microcredito ? `<dt>Domanda al microcredito</dt><dd>${esc(d.microcredito)}</dd>` : ''}</dl>
+    <div class="num"><div><b>${Number(d.costo || 0).toLocaleString('it-IT')} €</b><span>avvio</span></div>
+      <div><b>${d.mesi || 0}</b><span>mesi</span></div><div><b>${d.clienti || 0}</b><span>clienti 1° anno</span></div></div></div>`;
+}
+
+function vProgetto() {
+  const g = Object.keys(A.progetti);
+  return `
+    <div class="grid" style="grid-template-columns:1fr auto;align-items:end">
+      <div><div class="titolo">Un assistente IA per il Calatino</div>
+        <div class="sotto">«Vorrei fare questo lavoro nel Calatino: pianificazione e investimento.» Un progetto per gruppo.</div></div>
+      ${badgesConsegne('progetto')}</div>
+    ${g.length ? `<div class="grid" style="grid-template-columns:repeat(${Math.min(g.length, 3)},1fr);margin-top:18px">${g.map(x => cardProgetto(x, A.progetti[x])).join('')}</div>`
+               : '<div class="vuoto" style="font-size:26px;margin-top:40px">📱 I gruppi stanno lavorando…</div>'}`;
+}
+
+function vVoto() {
+  const g = Object.keys(A.progetti);
+  if (!g.length) return '<div class="titolo">Votazione</div><div class="vuoto">Nessun progetto consegnato.</div>';
+  const tot = Object.values(A.voti).reduce((a, b) => a + b, 0) || 1;
+  const ord = g.slice().sort((a, b) => (A.voti[b] || 0) - (A.voti[a] || 0));
+  return `<div class="titolo">Se foste la Fondazione microcredito…</div>
+    <div class="sotto">…quale assistente accompagnereste a partire domani?</div>
+    <div class="panel" style="margin-top:20px">
+      ${ord.map((x, i) => { const v = A.voti[x] || 0;
+        return `<div class="riga" style="font-size:22px"><div class="lab"><b>${i === 0 && v ? '🏆 ' : ''}${esc(A.progetti[x].nome)}</b> <span style="color:var(--muted)">· Gruppo ${esc(x)}</span>
+          <div class="barra"><i style="width:${v / tot * 100}%;background:${COLORI[i % COLORI.length]}"></i></div></div><div class="pct">${v}</div></div>`; }).join('')}
+    </div>`;
+}
+
+function vFuturo() {
+  const r = A.per('futuro');
+  return `<div class="titolo">Le professioni che volete esplorare</div>
+    <div class="sotto">Dopo l'invio: copiate il prompt, ricopiate la scheda a mano e confrontatevi con chi avete accanto.</div>
+    <div class="grid" style="grid-template-columns:repeat(4,1fr);margin-top:20px">
+      ${r.map(x => `<div class="post ${nuovo('f' + x.id)}"><b>${esc(x.dati.professione)}</b><br>${esc(x.dati.settore)}
+        ${x.dati.competenza ? `<span class="u">📚 ${esc(x.dati.competenza)}</span>` : ''}</div>`).join('') || '<div class="vuoto">📱 Compilate la vostra scheda…</div>'}
+    </div>`;
+}
+
+function vChiusura() {
+  const r = A.per('futuro').filter(x => x.dati.frase);
+  return `<div class="titolo" style="margin-bottom:6px">Quale lavoro voglio costruire, qui?</div>
+    <div class="sotto" style="margin-bottom:20px">…e quali strumenti mi servono per farlo?</div>
+    <div class="muro">${r.map(x => `<div class="post ${nuovo('c' + x.id)}">«${esc(x.dati.frase)}»<span class="u">— ${esc(x.nome)}</span></div>`).join('') || '<div class="vuoto">Nessuna frase</div>'}</div>`;
+}
+
+function vPodio() {
+  const c = A.punteggi.persone;
+  const g = (i, h, col) => c[i] ? `<div class="gradino"><div class="chi">${esc(c[i].nome)}</div><div class="pt">${c[i].totale} punti · ${esc(c[i].gruppo)}</div>
+    <div class="blocco" style="height:${h}px;background:${col}">${i + 1}</div></div>` : '';
+  return `<div class="titolo" style="text-align:center">🏆 Il podio</div>
+    <div class="grid" style="grid-template-columns:2fr 1fr;margin-top:10px;align-items:end">
+      <div class="podio">${g(1, 170, '#C9D3E0')}${g(0, 240, 'var(--giallo)')}${g(2, 120, '#D9935C')}</div>
+      <div class="panel"><h3 style="color:var(--giallo);margin-bottom:6px">Classifica gruppi</h3>
+        ${A.punteggi.gruppi.map((x, i) => `<div class="riga"><div class="lab">${i + 1}. ${esc(x.gruppo)} <span style="color:var(--muted);font-size:14px">(${x.voti} voti)</span></div><div class="pct">${x.punti}</div></div>`).join('')}
+        <div style="color:var(--muted);font-size:13px;margin-top:8px">Punti dei laboratori di gruppo + voti ricevuti + media individuale dei membri</div></div>
+    </div>`;
+}
+
+/* ---------- TESTO PER CLAUDE ---------- */
+function sezioni(quali) {
+  const out = [];
+  const testo = id => (TUTTE_FRASI.find(f => f[0] === id) || ['', ''])[1];
+  if (quali.includes('parole')) {
+    const p = A.per('lobby').map(r => r.dati.parola).filter(Boolean);
+    if (p.length) out.push(`## "Dopo il workshop, l'IA per me è…" (una parola a testa)\n${p.join(', ')}`);
+  }
+  if (quali.includes('quiz')) {
+    const r = A.per('quiz');
+    if (r.length) out.push('## Sfida Vero/Falso\n' + QUIZ.map((q, i) => {
+      const x = r.filter(y => y.dati.q === i);
+      const ok = x.filter(y => y.dati.r === D.chiave.quiz[i]).length;
+      return `- "${q.t}" (${D.chiave.quiz[i] ? 'vero' : 'falso'}) → ${x.length ? Math.round(ok / x.length * 100) : 0}% di risposte corrette`;
+    }).join('\n'));
+  }
+  if (quali.includes('caccia')) {
+    const g = Object.entries(A.cacce);
+    if (g.length) {
+      const cont = {};
+      g.forEach(([, r]) => Object.keys(r.dati.segnalate || {}).forEach(id => { cont[id] = (cont[id] || 0) + 1; }));
+      out.push(`## Caccia all'errore (${g.length} gruppi)\n` + TUTTE_FRASI.map(([id, t]) =>
+        `- ${D.chiave.caccia[id] ? '[ERRORE]' : '[corretta]'} "${t}" → segnalata da ${cont[id] || 0} gruppi${D.chiave.caccia[id] ? ' · ' + D.chiave.caccia[id].nota : ''}`).join('\n')
+        + '\nErrore più insidioso scelto dai gruppi:\n' + g.map(([n, r]) => `- Gruppo ${n}: "${testo(r.dati.insidioso)}"`).join('\n'));
+    }
+  }
+  if (quali.includes('progetto')) {
+    const g = Object.keys(A.progetti);
+    if (g.length) out.push('## Progetti dei gruppi (assistenti IA per il Calatino)\n' + g.map(x => {
+      const d = A.progetti[x];
+      return `### Gruppo ${x} — "${d.nome}" (${A.voti[x] || 0} voti)\nFiliera: ${d.filiera}\nProblema: ${d.problema}\nPer chi: ${d.perChi}\nCompiti: ${d.compiti}\nResta umano: ${d.umano || '-'}\nNumeri del gruppo: avvio ${d.costo || 0} €, ${d.mesi || 0} mesi per partire, ${d.clienti || 0} clienti il primo anno\nDomanda per la Fondazione microcredito: ${d.microcredito || '-'}`;
+    }).join('\n\n'));
+  }
+  if (quali.includes('futuro')) {
+    const r = A.per('futuro');
+    if (r.length) out.push(`## Professioni da esplorare e frasi finali (${r.length})\n` + r.map(x =>
+      `- ${x.dati.professione} (${x.dati.settore}) · competenza mancante: ${x.dati.competenza || '-'} · frase: "${x.dati.frase || '-'}"`).join('\n'));
+  }
+  return out.join('\n\n');
+}
+
+const ISTRUZIONI = {
+  caccia: `Spiega alla sala, in massimo 180 parole, perché l'errore trovato da meno gruppi è il più insidioso, e dai 4 regole pratiche per verificare un testo prodotto da un'IA prima di usarlo nel lavoro.`,
+  progetto: `Prendi il progetto più votato e trasformalo in un mini piano di avvio da mostrare alla sala:
+- in una frase, che cosa fa e per chi;
+- budget di avvio in una tabella, partendo dai numeri del gruppo (correggili se sono incoerenti e spiega perché);
+- tempi in 3 tappe, i primi 10 clienti e come trovarli nel Calatino;
+- 3 rischi e come ridurli;
+- come rispondere alla domanda del gruppo per la Fondazione microcredito, e altre 3 domande da portare all'incontro.
+Segnala chiaramente quali numeri sono stime da verificare.`,
+  chiusura: `Scrivi una breve lettera alla sala (massimo 170 parole) che riprenda alcune delle loro parole e delle loro frasi finali e risponda alla domanda "quale lavoro voglio costruire, e quali strumenti mi servono per farlo qui?". Poi, in un elenco, raggruppa le professioni che vogliono esplorare in 3 famiglie con la competenza più utile per ciascuna.`,
+  tutto: `Prepara il resoconto delle esercitazioni in 5 parti brevi: clima della sala; cosa ci ha insegnato la sfida Vero/Falso; cosa ci ha insegnato la caccia all'errore; il progetto più promettente con 3 passi successivi; le professioni da esplorare e un messaggio finale alla sala. Massimo 450 parole, linguaggio semplice.`
+};
+
+function testoClaude(cosa) {
+  const f = D.stato.fase;
+  let quali, istr;
+  if (cosa === 'tutto') { quali = ['parole', 'quiz', 'caccia', 'progetto', 'futuro']; istr = ISTRUZIONI.tutto; }
+  else if (['lobby', 'quiz', 'caccia'].includes(f)) { quali = ['caccia']; istr = ISTRUZIONI.caccia; }
+  else if (f === 'progetto' || f === 'voto') { quali = ['progetto']; istr = ISTRUZIONI.progetto; }
+  else { quali = ['parole', 'futuro']; istr = ISTRUZIONI.chiusura; }
+  const t = sezioni(quali);
+  if (!t) return '';
+  return `Sono il relatore di un workshop su "L'Intelligenza Artificiale e la trasformazione del mondo del lavoro" a Caltagirone (Sicilia). In sala ci sono ${nConnessi()} partecipanti, divisi in gruppi, che hanno appena svolto le esercitazioni dal telefono. Ecco i dati raccolti in aula (senza nomi):
+
+${t}
+
+COMPITO:
+${istr}`;
+}
+
+function copiaTesto(t) {
+  if (!t) return toast('Non ci sono ancora dati per questa fase');
+  const fb = () => { const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); toast('Copiato! Incollalo in Claude'); } catch (e) { toast('Copia non riuscita'); } ta.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(t).then(() => toast('Copiato! Incollalo in Claude'), fb);
+  else fb();
+}
+
+/* ---------- COMANDI ---------- */
+async function azione(fn, ...args) {
+  if (occupato) return;
+  occupato = true;
+  try { await run(fn, PIN, ...args); await aggiorna(); }
+  catch (e) { toast(msgErr(e)); }
+  finally { occupato = false; }
+}
+function vaiA(f) { return azione('impostaFase', f); }
+function avanti() {
+  if (!D) return;
+  const s = D.stato;
+  if (s.fase === 'quiz') {
+    if (s.qAperta) return azione('chiudiDomanda');
+    if (s.q < QUIZ.length - 1) return azione('prossimaDomanda');
+  }
+  if (s.fase === 'caccia' && !s.rivela) return azione('impostaRivela', true);
+  const i = FASI.indexOf(s.fase);
+  if (i < FASI.length - 1) vaiA(FASI[i + 1]);
+}
+$('#fasi').onclick = e => { const b = e.target.closest('[data-f]'); if (b) vaiA(b.dataset.f); };
+$('#prev').onclick = () => { if (!D) return; const i = FASI.indexOf(D.stato.fase); if (i > 0) vaiA(FASI[i - 1]); };
+$('#next').onclick = avanti;
+$('#piu').onclick = () => azione('aggiungiTempo', 60);
+$('#claudeFase').onclick = () => { if (D) copiaTesto(testoClaude('fase')); };
+$('#claudeTutto').onclick = () => { if (D) copiaTesto(testoClaude('tutto')); };
+$('#full').onclick = () => { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => {}); else document.exitFullscreen(); };
+$('#reset').onclick = async () => {
+  if (!confirm('Cancellare TUTTE le risposte e ripartire da zero?')) return;
+  if (!confirm('Sicuro? L\'operazione non si può annullare.')) return;
+  visti.clear();
+  await azione('azzera');
+  toast('Workshop azzerato');
+};
+document.addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); avanti(); }
+  if (e.key === 'ArrowLeft') $('#prev').click();
+});
+
+if (PIN) avvia(); else login();
+</script>
+</body>
+</html>
